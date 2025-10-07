@@ -1,0 +1,35 @@
+.animated-bg-dark {
+  background: linear-gradient(-45deg, #000000, #1f1f1f, #ff8c00, #ff6600);
+  background-size: 400% 400%;
+  animation: gradientMove 12s ease infinite;
+}
+
+.animated-bg-light {
+  background: linear-gradient(-45deg, #ffcc80, #ffe0b2, #ffb74d, #ff9800);
+  background-size: 400% 400%;
+  animation: gradientMove 12s ease infinite;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.rotate-icon {
+  animation: spin 0.4s ease;
+}
+@keyframes spin {
+  from { transform: rotate(-180deg); opacity: 0; }
+  to { transform: rotate(0deg); opacity: 1; }
+}
+
+/* Scroll to top hover animation */
+.fixed.bottom-6.right-6:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
+
+html {
+  scroll-behavior: smooth;
+}
