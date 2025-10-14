@@ -3,16 +3,18 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Sun, Moon, ArrowUp } from "lucide-react";
 import { TypeAnimation } from "react-type-animation";
-import emailjs from "emailjs-com";
+import emailjs from "@emailjs/browser";
 import { Link as ScrollLink, animateScroll as scroll } from "react-scroll";
+import { Toaster, toast } from "react-hot-toast";
 import "./App.css";
+import Project from "./components/Projects";
+
 
 export default function App() {
   const [darkMode, setDarkMode] = useState(true);
   const [filter, setFilter] = useState("All");
   const [showScroll, setShowScroll] = useState(false);
 
-  // Scroll-to-top visibility
   useEffect(() => {
     const onScroll = () => setShowScroll(window.scrollY > 300);
     window.addEventListener("scroll", onScroll);
@@ -46,21 +48,35 @@ export default function App() {
   const filteredProjects =
     filter === "All" ? projects : projects.filter((p) => p.category === filter);
 
-  const sendEmail = (e) => {
-    e.preventDefault();
-    // Replace the strings below with your EmailJS values
-    emailjs
-      .sendForm("your_service_id", "your_template_id", e.target, "your_public_key")
-      .then(
-        () => {
-          alert("Message sent successfully!");
-          e.target.reset();
-        },
-        () => {
-          alert("Something went wrong — please try again.");
-        }
-      );
-  };
+  // ✅ FIXED EmailJS Function
+const sendEmail = (e) => {
+  e.preventDefault();
+  const currentTime = new Date().toLocaleString();
+
+  emailjs
+    .send(
+      import.meta.env.VITE_EMAILJS_SERVICE_ID,
+      import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+      {
+        name: e.target.name.value,
+        email: e.target.email.value,
+        message: e.target.message.value,
+        time: currentTime,
+      },
+      import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+    )
+    .then(
+      () => {
+        toast.success("✅ Message sent successfully!");
+        e.target.reset();
+      },
+      (error) => {
+        console.error("EmailJS Error:", error);
+        toast.error("❌ Something went wrong — please try again later.");
+      }
+    );
+};
+  // Scroll to top function
 
   const scrollToTop = () => scroll.scrollToTop();
 
@@ -70,13 +86,15 @@ export default function App() {
         darkMode ? "animated-bg-dark text-white" : "animated-bg-light text-black"
       }`}
     >
-      {/* NAV */}
+      <Toaster position="top-right" reverseOrder={false} />
+
+      {/* NAVBAR */}
       <nav className="fixed top-0 left-0 w-full backdrop-blur-md bg-black/40 z-50 flex justify-between items-center px-6 md:px-10 py-4">
         <h1
           className="text-2xl font-bold text-orange-500 cursor-pointer"
           onClick={scrollToTop}
         >
-          MyPortfolio
+          zatsfolio
         </h1>
 
         <ul className="hidden md:flex gap-8 items-center">
@@ -87,7 +105,7 @@ export default function App() {
                 smooth={true}
                 duration={600}
                 spy={true}
-                offset={-80} /* account for navbar height */
+                offset={-80}
                 activeClass="text-orange-400 border-b-2 border-orange-400"
                 className="cursor-pointer hover:text-orange-400 transition"
               >
@@ -109,8 +127,8 @@ export default function App() {
       </nav>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 pt-20"> {/* pt-20 to offset fixed navbar height */}
-        {/* HERO / HOME */}
+      <main className="flex-1 pt-20">
+        {/* HERO SECTION */}
         <section id="home" className="min-h-screen flex flex-col items-center justify-center text-center px-6">
           <h1 className="text-5xl font-bold mb-4">Hi, I’m Zachi Tolentino</h1>
 
@@ -134,69 +152,74 @@ export default function App() {
           </p>
         </section>
 
-        {/* ABOUT */}
-        <section id="about" className="min-h-screen flex flex-col items-center justify-center text-center px-6">
-          <h2 className="text-4xl font-semibold mb-6">About Me</h2>
-          <p className="max-w-3xl text-lg leading-relaxed">
-            I’m an aspiring IT professional with interest in full-stack web development, UI/UX,
-            and problem solving. I enjoy learning new technologies and building useful products.
-          </p>
-        </section>
+        {/* ABOUT SECTION */}
+      <motion.section
+        id="about"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className="min-h-screen flex flex-col items-center justify-center text-center px-6"
+      >
+        <h2 className="text-4xl font-semibold mb-6">About Me</h2>
+        <p className="max-w-2xl text-lg mb-8 text-gray-300">
+        I’m an IT student passionate about building responsive, visually appealing, and user-friendly
+        digital experiences. I specialize in front-end development using React, Tailwind, and modern tools.
+      </p>
+
+      {/* ✅ Download Resume Button */}
+      <motion.a
+        href="/resume.pdf"
+        download="ZachiTolentino-Resume.pdf"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        className="inline-block bg-orange-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-orange-600 transition shadow-lg"
+      >
+        📄 Download Resume
+      </motion.a>
+      </motion.section>
+
 
         {/* SKILLS */}
         <section id="skills" className="min-h-screen flex flex-col items-center justify-center text-center px-6">
-          <h2 className="text-4xl font-semibold mb-8">My Tech Stack</h2>
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-10">
-            <img src="/icons/react.svg" alt="React" className="h-16 w-16 hover:scale-110 transition-transform" />
-            <img src="/icons/firebase.svg" alt="Firebase" className="h-16 w-16 hover:scale-110 transition-transform" />
-            <img src="/icons/nodejs.svg" alt="Node.js" className="h-16 w-16 hover:scale-110 transition-transform" />
-            <img src="/icons/js.svg" alt="JavaScript" className="h-16 w-16 hover:scale-110 transition-transform" />
-            <img src="/icons/tailwind.svg" alt="Tailwind" className="h-16 w-16 hover:scale-110 transition-transform" />
-          </div>
-        </section>
+  <h2 className="text-4xl font-semibold mb-8">My Tech Stack</h2>
+  <div className="w-full max-w-2xl space-y-6">
+    {[
+      { name: "React", icon: "/icons/react.svg", level: 85 },
+      { name: "Firebase", icon: "/icons/firebase.svg", level: 50 },
+      { name: "Node.js", icon: "/icons/nodejs.svg", level: 60 },
+      { name: "JavaScript", icon: "/icons/js.svg", level: 90 },
+      { name: "Tailwind CSS", icon: "/icons/tailwind.svg", level: 80 },
+    ].map((tech, index) => (
+      <motion.div
+        key={index}
+        className="text-left"
+        initial={{ opacity: 0, x: -50 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: index * 0.1 }}
+      >
+        <div className="flex items-center gap-3 mb-1">
+          <img src={tech.icon} alt={tech.name} className="h-10 w-10" />
+          <span className="font-semibold">{tech.name}</span>
+          <span className="ml-auto text-orange-400 font-medium">{tech.level}%</span>
+        </div>
+
+        <div className="w-full h-3 bg-gray-700 rounded-full overflow-hidden">
+          <motion.div
+            className="h-full bg-orange-500"
+            initial={{ width: 0 }}
+            whileInView={{ width: `${tech.level}%` }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+          />
+        </div>
+      </motion.div>
+    ))}
+  </div>
+</section>
+
 
         {/* PROJECTS */}
-        <section id="projects" className="min-h-screen flex flex-col items-center justify-center text-center py-12 px-6">
-          <h2 className="text-4xl font-semibold mb-8">My Projects</h2>
-
-          <div className="flex gap-4 mb-8 flex-wrap justify-center">
-            {["All", "Web", "Mobile"].map((category) => (
-              <button
-                key={category}
-                onClick={() => setFilter(category)}
-                className={`px-5 py-2 rounded-full font-medium transition-all ${
-                  filter === category
-                    ? "bg-orange-500 text-white shadow-lg"
-                    : "bg-gray-700 text-gray-300 hover:bg-orange-400 hover:text-white"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-
-          <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-6 max-w-6xl">
-            {filteredProjects.map((project, idx) => (
-              <motion.div
-                key={idx}
-                layout
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45 }}
-                className="bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-orange-500/50 transition-shadow"
-              >
-                <img src={project.image} alt={project.title} className="w-full h-48 object-cover" />
-                <div className="p-5 text-left">
-                  <h3 className="text-2xl font-semibold mb-2">{project.title}</h3>
-                  <p className="text-gray-400 mb-3">{project.description}</p>
-                  <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
-                    View Project →
-                  </a>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </section>
+        <Project />
 
         {/* CONTACT */}
         <section id="contact" className="min-h-screen flex flex-col items-center justify-center py-12 px-6">

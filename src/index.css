@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom Toast Colors */
+[data-sonner-toaster] {
+  --toast-bg: #1f2937;
+  --toast-text: #fff;
+  --toast-border: #f59e0b;
+}
